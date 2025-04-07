@@ -30,6 +30,15 @@
 			padding: 10px;
 			overflow: auto;
 		}
+        #button {
+            background-color: var(--vscode-button-background);
+            color: var(--vscode-button-foreground);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
 	</style>
 </head>
 <body>
@@ -40,12 +49,18 @@
 		</div>
 		<div id="divider"></div>
 		<div id="bottom">
-			<h2>Bottom Panel</h2>
-			<p>This is the bottom panel content.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Variables</h2>
+                <button onclick="requestUpdate()">Update</button>
+            </div>
+            <div id="variables"></div>
 		</div>
 	</div>
 
 	<script>
+        const vscode = acquireVsCodeApi();
+
+        const button = document.getElementById('button');
 		const container = document.getElementById('container');
 		const divider = document.getElementById('divider');
 
@@ -76,6 +91,16 @@
 			// Actualizar las filas del grid
 			container.style.gridTemplateRows = `${topHeight}px 5px ${bottomHeight}px`;
 		});
+
+        function requestUpdate() {
+            vscode.postMessage({ type: 'update-variables' });
+        }
+
+        window.addEventListener('message', event => {
+            if (event.data.type === 'variables') {
+                document.getElementById('variables').innerHTML = `<pre>${JSON.stringify(event.data.data, null, 2)}</pre>`;
+            }
+        });
 	</script>
 </body>
 </html>

@@ -28,6 +28,19 @@ export function activate(context: vscode.ExtensionContext) {
 				localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'media'))]
 			}
 		);
+
+		panel.webview.onDidReceiveMessage(async (message) => {
+			if (message.type === 'update-variables') {
+			  const session = vscode.debug.activeDebugSession;
+			  const frame = vscode.debug.activeDebugConsole; // o usar frame de evento
+		  
+			  if (session) {
+				const variables = await getVariablesFromSession(session);
+				panel.webview.postMessage({ type: 'variables', data: variables });
+			  }
+			}
+		});
+
 		// And set its HTML content
 		const htmlPath = path.join(context.extensionPath, 'media', 'webview.html');
 		let html = fs.readFileSync(htmlPath, 'utf8');
@@ -38,25 +51,36 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 }
 
-// This function returns the HTML content for the webview
-function getWebviewContent() {
-	// You can use any HTML and JavaScript here
-	// This is a simple example that creates a button and displays an alert when clicked
-	return `<!DOCTYPE html>
-	<html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>C++ Debug Visualizer</title>
-	</head>
-	<body>
-		<h1>C++ Debug Visualizer</h1>
-		<p>This is a simple webview for C++ Debug Visualizer.</p>
-		<button onclick="showAlert()">Click me!</button>
-	</body>
-	</html>`;
-}
-// The commandId parameter must match the command field in package.json
+async function getVariablesFromSession(session: vscode.DebugSession) {
+	const threads = await session.customRequest('threads');
+	const threadId = threads.threads[0]?.id;
+	if (!threadId) return [];
 
+	const stack = await session.customRequest('stackTrace', { threadId });
+	const frameId = stack.stackFrames[0]?.id;
+	if (!frameId) return [];
+
+	const scopesResponse = await session.customRequest('scopes', { frameId });
+
+	const data = [];
+
+	for (const scope of scopesResponse.scopes) {
+		const varsResponse = await session.customRequest('variables', {
+			variablesReference: scope.variablesReference
+		});
+
+		data.push({
+			scope: scope.name,
+			variables: varsResponse.variables.map((v: { name: string; value: string; type: string }) => ({
+				name: v.name,
+				value: v.value,
+				type: v.type
+			}))
+		});
+	}
+
+	return data;
+}
+  
 // This method is called when your extension is deactivated
 export function deactivate() {}
