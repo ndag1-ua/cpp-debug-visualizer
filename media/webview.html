@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>C++ Debug Visualizer</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			overflow: hidden;
+			font-family: sans-serif;
+		}
+		#container {
+			display: grid;
+			grid-template-rows: 1fr 5px 1fr;
+			height: 100vh;
+			width: 100%;
+		}
+		#top {
+			padding: 10px;
+			overflow: auto;
+		}
+		#divider {
+            background: var(--vscode-editorGroup-border);
+			cursor: row-resize;
+		}
+		#bottom {
+			padding: 10px;
+			overflow: auto;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<div id="top">
+			<h2>Top Panel</h2>
+			<p>This is the top panel content.</p>
+		</div>
+		<div id="divider"></div>
+		<div id="bottom">
+			<h2>Bottom Panel</h2>
+			<p>This is the bottom panel content.</p>
+		</div>
+	</div>
+
+	<script>
+		const container = document.getElementById('container');
+		const divider = document.getElementById('divider');
+
+		let isDragging = false;
+
+		divider.addEventListener('mousedown', () => {
+			isDragging = true;
+			document.body.style.cursor = 'row-resize';
+		});
+
+		document.addEventListener('mouseup', () => {
+			isDragging = false;
+			document.body.style.cursor = 'default';
+		});
+
+		document.addEventListener('mousemove', (e) => {
+			if (!isDragging) return;
+
+			const offsetY = e.clientY;
+			const containerRect = container.getBoundingClientRect();
+
+			// Calcular el tamaño relativo al contenedor
+			const topHeight = offsetY - containerRect.top;
+			const bottomHeight = containerRect.bottom - offsetY - 5; // 5px es el alto del divider
+
+			if (topHeight < 50 || bottomHeight < 50) return; // límite mínimo
+
+			// Actualizar las filas del grid
+			container.style.gridTemplateRows = `${topHeight}px 5px ${bottomHeight}px`;
+		});
+	</script>
+</body>
+</html>
