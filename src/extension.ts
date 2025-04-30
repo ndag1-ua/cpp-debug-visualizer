@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { App } from "./App";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -15,10 +16,10 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('cpp-debug-visualizer.helloWorld', () => {
+	const disposable = vscode.commands.registerCommand('cpp-debug-visualizer.open', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from C++ Debug Visualizer!');
+		vscode.window.showInformationMessage('C++ Debug Visualizer Opened!');
 		var panel = vscode.window.createWebviewPanel(
 			'cppDebugVisualizer', // Identifies the type of the webview. Used internally
 			'C++ Debug Visualizer', // Title of the panel displayed to the user
@@ -36,6 +37,12 @@ export function activate(context: vscode.ExtensionContext) {
 		  
 			  if (session) {
 				const variables = await getVariablesFromSession(session);
+				// Aqui es donde se filtran los scopes
+				const app = new App();
+				//pasar el scope a la app y que devuelva el dom
+				
+
+
 				panel.webview.postMessage({ type: 'variables', data: variables });
 			  }
 			}
@@ -71,11 +78,7 @@ async function getVariablesFromSession(session: vscode.DebugSession) {
 
 		data.push({
 			scope: scope.name,
-			variables: varsResponse.variables.map((v: { name: string; value: string; type: string }) => ({
-				name: v.name,
-				value: v.value,
-				type: v.type
-			}))
+			variables: varsResponse.variables
 		});
 	}
 

@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "cpp-debug-visualizer.helloWorld",
-        "title": "Hello World"
+        "command": "cpp-debug-visualizer.open",
+        "title": "C++ Debug Visualizer: Open"
       }
     ]
   },
