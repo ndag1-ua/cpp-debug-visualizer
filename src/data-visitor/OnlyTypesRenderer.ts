@@ -21,11 +21,11 @@ export class OnlyTypesRenderer implements DataVisitor {
     visitComplex(data: ComplexData): HTMLElement {
         const element = document.createElement("div");
         element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-        const membersList = document.createElement("ul");
-        data.members.forEach((member) => {
-        membersList.appendChild(member.accept(this));
+        const elementsList = document.createElement("ul");
+        data.elements.forEach((member) => {
+        elementsList.appendChild(member.accept(this));
         });
-        element.appendChild(membersList);
+        element.appendChild(elementsList);
         return element;
     }
 

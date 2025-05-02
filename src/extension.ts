@@ -34,16 +34,24 @@ export function activate(context: vscode.ExtensionContext) {
 			if (message.type === 'update-variables') {
 			  const session = vscode.debug.activeDebugSession;
 			  const frame = vscode.debug.activeDebugConsole; // o usar frame de evento
+
 		  
 			  if (session) {
 				const variables = await getVariablesFromSession(session);
 				// Aqui es donde se filtran los scopes
 				const app = new App();
-				//pasar el scope a la app y que devuelva el dom
+				// coger el scope locals
+				const locals = variables.find((scope) => scope.scope === 'Locals');
+
+				// pasar scope locals a app y visualizar
+				if (locals) {
+					app.createDataList(locals.variables);
+					
+				}
 				
+				const htmlData = app.visualizeData().outerHTML;
 
-
-				panel.webview.postMessage({ type: 'variables', data: variables });
+				panel.webview.postMessage({ type: 'variables', data: htmlData });
 			  }
 			}
 		});
@@ -57,6 +65,27 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 }
+
+async function expandVariable(session: vscode.DebugSession, variable: any): Promise<any> {
+	const expanded: any = { ...variable };
+  
+	if (variable.variablesReference && variable.variablesReference > 0) {
+
+		const response = await session.customRequest('variables', {
+		variablesReference: variable.variablesReference
+		});
+
+		expanded.children = [];
+
+		for (const child of response.variables) {
+		const fullChild = await expandVariable(session, child);  // llamada recursiva
+		expanded.children.push(fullChild);
+		}
+	}
+  
+	return expanded;
+  }
+  
 
 async function getVariablesFromSession(session: vscode.DebugSession) {
 	const threads = await session.customRequest('threads');
@@ -76,11 +105,19 @@ async function getVariablesFromSession(session: vscode.DebugSession) {
 			variablesReference: scope.variablesReference
 		});
 
+		const expandedVariables = [];
+
+		for (const variable of varsResponse.variables) {
+			const fullVar = await expandVariable(session, variable);
+			expandedVariables.push(fullVar);
+		}
+
 		data.push({
 			scope: scope.name,
-			variables: varsResponse.variables
+			variables: expandedVariables
 		});
 	}
+	
 
 	return data;
 }

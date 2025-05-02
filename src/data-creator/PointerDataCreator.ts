@@ -1,20 +1,16 @@
-/*
+
 import { Data } from '../data/Data';
 import { DataCreator } from './DataCreator';
+import { PointerData } from '../data/PointerData';
 
 export class PointerDataCreator extends DataCreator {
-    create(variable: any): Data {
-        const arrayData = new Data(variable.name, variable.type);
-        arrayData.value = variable.value.map((item: any) => this.createData(item));
-        return arrayData;
+    create(variable: any): PointerData {
+        const name = variable.name || variable.evaluateName || variable.value;
+        const type = variable.type || typeof variable.value;
+        const value = variable.value !== undefined ? variable.value : null;
+        const pointer = variable.pointer || null; // Assuming pointer is a property of the variable
+
+        return new PointerData(name, type, value, pointer);
     }
 
-    createData(variable: any): Data {
-        if (Array.isArray(variable)) {
-            return this.create(variable);
-        } else {
-            return super.createData(variable);
-        }
-    }
 }
-*/

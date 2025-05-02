@@ -98,7 +98,7 @@
 
         window.addEventListener('message', event => {
             if (event.data.type === 'variables') {
-                document.getElementById('variables').innerHTML = event.data.data;
+                document.getElementById('variables').innerHTML = `<pre>${JSON.stringify(event.data.data, null, 2)}</pre>`;
             }
         });
 	</script>

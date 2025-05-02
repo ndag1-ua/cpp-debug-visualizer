@@ -1,22 +1,14 @@
-/*
-
 import { Data } from '../data/Data';
+import { SimpleData } from '../data/SimpleData';
 import { DataCreator } from './DataCreator';
 
 export class SimpleDataCreator extends DataCreator {
-    create(variable: any): Data {
-        const arrayData = new Data(variable.name, variable.type);
-        arrayData.value = variable.value.map((item: any) => this.createData(item));
-        return arrayData;
+    create(variable: any): SimpleData {
+        const name = variable.name || variable.evaluateName || variable.value;
+        const type = variable.type || typeof variable.value;
+        const value = variable.value !== undefined ? variable.value : null;
+
+        return new SimpleData(name, type, value);
     }
 
-    createData(variable: any): Data {
-        if (Array.isArray(variable)) {
-            return this.create(variable);
-        } else {
-            return super.createData(variable);
-        }
-    }
 }
-
-*/

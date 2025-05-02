@@ -1,20 +1,16 @@
-/*
+
 import { Data } from '../data/Data';
 import { DataCreator } from './DataCreator';
+import { ComplexData } from '../data/ComplexData';
 
 export class ComplexDataCreator extends DataCreator {
-    create(variable: any): Data {
-        const arrayData = new Data(variable.name, variable.type);
-        arrayData.value = variable.value.map((item: any) => this.createData(item));
-        return arrayData;
+    create(variable: any): ComplexData {
+        const name = variable.name || variable.evaluateName || variable.value;
+        const type = variable.type || typeof variable.value;
+        const value = variable.value !== undefined ? variable.value : null;
+        const complex = variable.complex || null; // Assuming complex is a property of the variable
+
+        return new ComplexData(name, type, value);
     }
 
-    createData(variable: any): Data {
-        if (Array.isArray(variable)) {
-            return this.create(variable);
-        } else {
-            return super.createData(variable);
-        }
-    }
 }
-*/

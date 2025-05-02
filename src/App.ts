@@ -1,8 +1,14 @@
 
 import { Data } from "./data/Data";
 import { DataVisitor } from "./data-visitor/DataVisitor";
+import { DataCreator } from "./data-creator/DataCreator";
+import { ArrayDataCreator } from "./data-creator/ArrayDataCreator";
+import { SimpleDataCreator } from "./data-creator/SimpleDataCreator";
+import { ComplexDataCreator } from "./data-creator/ComplexDataCreator";
+import { PointerDataCreator } from "./data-creator/PointerDataCreator";
 import { FullRenderer } from "./data-visitor/FullRenderer";
 import { OnlyTypesRenderer } from "./data-visitor/OnlyTypesRenderer";
+import { SIMPLE_TYPES } from './utils/types';
 
 export class App {
   private dataList: Data[] = [];
@@ -61,6 +67,34 @@ export class App {
       }
     });
     return container;
+  }
+
+  createDataList(data: any) {
+    //Pasar data a previousData
+    this.previousData = this.dataList;
+    this.dataList = [];
+    //Vaciar dataList
+    this.dataList.length = 0;
+    //Crear nuevo data
+    for (const variable of data) {
+      const createdData = this.createData(variable);
+      if (createdData) {
+        this.dataList.push(createdData);
+      }
+    }
+  }
+
+  createData(variable: any): Data | null {
+    if (variable === undefined || variable === null) {
+      return null;
+    }
+    
+    if (SIMPLE_TYPES.has(variable.type)) {
+      return new SimpleDataCreator().create(variable); 
+    } else {
+      return null; // No se crea un objeto Data para tipos no simples
+    }
+
   }
 
 }
