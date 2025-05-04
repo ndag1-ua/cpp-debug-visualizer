@@ -6,7 +6,7 @@ export class ArrayData extends Data {
         super(name, type);
     }
 
-    accept(visitor: DataVisitor): HTMLElement {
+    accept(visitor: DataVisitor): string {
         return visitor.visitArray(this);
     }
 

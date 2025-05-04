@@ -8,7 +8,7 @@ import { ComplexDataCreator } from "./data-creator/ComplexDataCreator";
 import { PointerDataCreator } from "./data-creator/PointerDataCreator";
 import { FullRenderer } from "./data-visitor/FullRenderer";
 import { OnlyTypesRenderer } from "./data-visitor/OnlyTypesRenderer";
-import { SIMPLE_TYPES } from './utils/types';
+import { SIMPLE_TYPES } from './types';
 
 export class App {
   private dataList: Data[] = [];
@@ -47,26 +47,31 @@ export class App {
     return Array.from(this.activeTypes);
   }
 
-  visualizeData(): HTMLElement {
-    const container = document.createElement("div");
-    this.dataList.forEach((data) => {
-      if (this.isTypeActive(data.type)) {
-        const element = data.accept(new FullRenderer());
-        container.appendChild(element);
-      }
-    });
-    return container;
+  visualizeData(): string {
+    const renderer = new FullRenderer();
+    let html = "";
+  
+    for (const data of this.dataList) {
+      const rendered = data.accept(renderer); // esto devuelve un string
+      html += rendered + "\n";
+    }
+    console.log("HTML: " + html);
+    return html;
   }
+  
 
-  visualizeDataTypes(): HTMLElement {
-    const container = document.createElement("div");
-    this.dataList.forEach((data) => {
-      if (this.isTypeActive(data.type)) {
-        const element = data.accept(new OnlyTypesRenderer());
-        container.appendChild(element);
-      }
-    });
-    return container;
+  visualizeDataTypes(): string {
+    const renderer = new OnlyTypesRenderer();
+    let html = "";
+  
+    for (const data of this.dataList) {
+      const rendered = data.accept(renderer); // esto devuelve un string
+      html += rendered + "\n";
+    }
+    
+
+
+    return html;
   }
 
   createDataList(data: any) {
@@ -79,6 +84,7 @@ export class App {
     for (const variable of data) {
       const createdData = this.createData(variable);
       if (createdData) {
+        console.log("Created data: name "+ createdData.name + " type: " + createdData.type);
         this.dataList.push(createdData);
       }
     }

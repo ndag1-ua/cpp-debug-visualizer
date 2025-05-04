@@ -4,56 +4,27 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>C++ Debug Visualizer</title>
-	<style>
-		html, body {
-			margin: 0;
-			padding: 0;
-			height: 100%;
-			overflow: hidden;
-			font-family: sans-serif;
-		}
-		#container {
-			display: grid;
-			grid-template-rows: 1fr 5px 1fr;
-			height: 100vh;
-			width: 100%;
-		}
-		#top {
-			padding: 10px;
-			overflow: auto;
-		}
-		#divider {
-            background: var(--vscode-editorGroup-border);
-			cursor: row-resize;
-		}
-		#bottom {
-			padding: 10px;
-			overflow: auto;
-		}
-        #button {
-            background-color: var(--vscode-button-background);
-            color: var(--vscode-button-foreground);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-	</style>
+
+	<link href="${cssUri}" rel="stylesheet">
+	  
 </head>
 <body>
 	<div id="container">
-		<div id="top">
+		<div id="top" class="drag-container">
 			<h2>Top Panel</h2>
-			<p>This is the top panel content.</p>
+			<div id="top-data" class="canvas-content">
+				<!-- Aquí meterás tu contenido dinámico del top -->
+			</div>
 		</div>
 		<div id="divider"></div>
-		<div id="bottom">
+		<div id="bottom" class="drag-container">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2>Variables</h2>
                 <button onclick="requestUpdate()">Update</button>
             </div>
-            <div id="variables"></div>
+            <div id="bottom-data" class="canvas-content">
+				<!-- Aquí meterás el contenido HTML generado de App.visualizeData() -->
+			</div>
 		</div>
 	</div>
 
@@ -98,9 +69,54 @@
 
         window.addEventListener('message', event => {
             if (event.data.type === 'variables') {
-                document.getElementById('variables').innerHTML = `<pre>${JSON.stringify(event.data.data, null, 2)}</pre>`;
+                document.getElementById('bottom-data').innerHTML = event.data.data;
             }
         });
+
+		function makeDraggableScroll(containerId) {
+			const container = document.getElementById(containerId);
+			const content = container.querySelector('.canvas-content');
+
+			let isDragging = false;
+			let startX, startY;
+			let offsetX = 0, offsetY = 0;
+
+			container.addEventListener('mousedown', (e) => {
+				isDragging = true;
+				container.classList.add('dragging');
+				startX = e.clientX - offsetX;
+				startY = e.clientY - offsetY;
+			});
+
+			document.addEventListener('mouseup', () => {
+				isDragging = false;
+				container.classList.remove('dragging');
+			});
+
+			document.addEventListener('mousemove', (e) => {
+				if (!isDragging) return;
+				e.preventDefault();
+
+				offsetX = e.clientX - startX;
+				offsetY = e.clientY - startY;
+
+				// Límites de desplazamiento
+				const minX = Math.min(0, container.clientWidth - content.scrollWidth);
+				const maxX = 0;
+				const minY = Math.min(0, container.clientHeight - content.scrollHeight);
+				const maxY = 0;
+
+				// Aplicar límites
+				offsetX = Math.max(minX, Math.min(maxX, offsetX));
+				offsetY = Math.max(minY, Math.min(maxY, offsetY));
+
+				content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+			});
+		}
+
+		makeDraggableScroll('top');
+		makeDraggableScroll('bottom');
+
 	</script>
 </body>
 </html>

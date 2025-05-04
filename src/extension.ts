@@ -30,6 +30,15 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 
+			// Cargar HTML con el cssUri reemplazado
+		const cssUri = panel.webview.asWebviewUri(
+			vscode.Uri.file(path.join(context.extensionPath, 'media', 'style.css'))
+		);
+		const htmlPath = path.join(context.extensionPath, 'media', 'webview.html');
+		let html = fs.readFileSync(htmlPath, 'utf8');
+		html = html.replace('${cssUri}', cssUri.toString());
+		panel.webview.html = html;
+
 		panel.webview.onDidReceiveMessage(async (message) => {
 			if (message.type === 'update-variables') {
 			  const session = vscode.debug.activeDebugSession;
@@ -49,18 +58,12 @@ export function activate(context: vscode.ExtensionContext) {
 					
 				}
 				
-				const htmlData = app.visualizeData().outerHTML;
+				const htmlData = app.visualizeData();
 
 				panel.webview.postMessage({ type: 'variables', data: htmlData });
 			  }
 			}
 		});
-
-		// And set its HTML content
-		const htmlPath = path.join(context.extensionPath, 'media', 'webview.html');
-		let html = fs.readFileSync(htmlPath, 'utf8');
-
-		panel.webview.html = html;
 	});
 
 	context.subscriptions.push(disposable);

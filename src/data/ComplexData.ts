@@ -6,7 +6,7 @@ export class ComplexData extends Data {
         super(name, type);
     }
 
-    accept(visitor: DataVisitor): HTMLElement {
+    accept(visitor: DataVisitor): string {
         return visitor.visitComplex(this);
     }
 

@@ -6,37 +6,34 @@ import { ComplexData } from "../data/ComplexData";
 import { ArrayData } from "../data/ArrayData";
 
 export class FullRenderer implements DataVisitor {
-  visitSimple(data: SimpleData): HTMLElement {
-    const element = document.createElement("div");
-    element.innerHTML = `<strong>${data.name}</strong>: ${data.value} (${data.type})`;
-    return element;
+  visitSimple(data: SimpleData): string {
+    return `
+      <div class="data-item">
+        <div class="data-header">${data.name}: ${data.type}</div>
+        <div class="data-box">${data.value}</div>
+      </div>
+    `;
   }
-
-  visitPointer(data: PointerData): HTMLElement {
+  
+  visitPointer(data: PointerData): string {
     const element = document.createElement("div");
     element.innerHTML = `<strong>${data.name}</strong>: ${data.address} (${data.type})`;
-    return element;
+    return element.outerHTML;
   }
 
-    visitComplex(data: ComplexData): HTMLElement {
-        const element = document.createElement("div");
-        element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-        const elementsList = document.createElement("ul");
-        data.elements.forEach((member) => {
-        elementsList.appendChild(member.accept(this));
-        });
-        element.appendChild(elementsList);
-        return element;
-    }
+  visitComplex(data: ComplexData): string {
+      const element = document.createElement("div");
+      element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
+      const elementsList = document.createElement("ul");
+      element.appendChild(elementsList);
+      return element.outerHTML;
+  }
 
-    visitArray(data: ArrayData): HTMLElement {
-        const element = document.createElement("div");
-        element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-        const elementsList = document.createElement("ul");
-        data.elements.forEach((element) => {
-        elementsList.appendChild(element.accept(this));
-        });
-        element.appendChild(elementsList);
-        return element;
-    }
+  visitArray(data: ArrayData): string {
+      const element = document.createElement("div");
+      element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
+      const elementsList = document.createElement("ul");
+      element.appendChild(elementsList);
+      return element.outerHTML;
+  }
 }

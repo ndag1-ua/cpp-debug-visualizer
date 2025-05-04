@@ -1,0 +1,98 @@
+/* === LAYOUT GENERAL === */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: sans-serif;
+}
+
+#container {
+  display: grid;
+  grid-template-rows: 1fr 5px 1fr;
+  height: 100vh;
+  width: 100%;
+}
+
+#top, #bottom {
+  overflow: hidden;
+  position: relative;
+}
+
+#divider {
+  background: var(--vscode-editorGroup-border);
+  cursor: row-resize;
+  height: 5px;
+}
+
+/* === DRAG PANEL SYSTEM === */
+
+.drag-container {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.drag-container.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.canvas-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(0, 0);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 16px;
+  padding: 20px;
+  top: 20%;
+  cursor: grab;
+}
+
+.canvas-content.dragging {
+  cursor: grabbing;
+  user-select: none;
+}
+
+
+/* === SIMPLE DATA STYLING === */
+
+.data-item {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  position: relative;
+}
+
+.data-header {
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--vscode-editorWidget-foreground);
+  text-align: left;
+  padding-left: 5px;
+}
+
+.data-box {
+  border: 2px solid var(--vscode-editorWidget-border);
+  border-radius: 8px;
+  padding: 12px;
+  background-color: var(--vscode-editorWidget-background);
+  text-align: center;
+  min-width: 80px;
+}
+
+/* === BOTÓN ACTUALIZAR === */
+
+#button {
+  background-color: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
