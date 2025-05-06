@@ -2,7 +2,7 @@ import { Data } from "./Data";
 import { DataVisitor } from "../data-visitor/DataVisitor";
 
 export class ArrayData extends Data {
-    constructor(name: string, type: string, public rows: number, public columns: number, public elements: Data[]) {
+    constructor(name: string, type: string, public rows: number, public columns: number, public elements: any[]) {
         super(name, type);
     }
 
@@ -18,4 +18,5 @@ export class ArrayData extends Data {
         }
         return false;
     }
+
 }

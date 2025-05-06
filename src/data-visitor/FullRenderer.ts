@@ -30,10 +30,12 @@ export class FullRenderer implements DataVisitor {
   }
 
   visitArray(data: ArrayData): string {
-      const element = document.createElement("div");
-      element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-      const elementsList = document.createElement("ul");
-      element.appendChild(elementsList);
-      return element.outerHTML;
+    return `
+      <div class="data-item">
+        <div class="data-header">${data.name}: ${data.type} ${data.rows} x ${data.columns}</div>
+        <div class="data-box">[${data.elements.map((element) => element.toString()).join(", ")}]</div>
+
+      </div>
+    `;
   }
 }

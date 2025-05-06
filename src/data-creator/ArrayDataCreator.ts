@@ -1,21 +1,39 @@
 
-
+import { Data } from '../data/Data';
 import { ArrayData } from '../data/ArrayData';
 import { DataCreator } from './DataCreator';
 
 export class ArrayDataCreator extends DataCreator {
     create(variable: any): ArrayData {
-        const name = variable.name || variable.evaluateName || variable.value;
-        const type = variable.type || typeof variable.value;
-        const value = variable.value !== undefined ? variable.value : null;
-        const array = variable; // Assuming array is a property of the variable
+        const name = variable.name;
+        const type = variable.type;
 
-        const rows = Array.isArray(array) ? array.length : 0;
-        const columns = Array.isArray(array[0]) ? array[0].length : 0;
-        const elements = Array.isArray(array) ? array.flat() : [];
-        return new ArrayData(name, type, rows, columns, elements);
+        const elements = this.extractArrayElements(variable); 
+    
+        return new ArrayData(name, type, 0, 0, elements);
+      }
+    
+      private extractArrayElements(variable: any): any[] {
+        if (!variable.children || variable.children.length == 0) {
+          return [];
+        }
 
-    }
+        const elements: any[] = [];
+    
+        for (const child of variable.children) {
+          if (child.name.startsWith('[') && child.name.endsWith(']') && child.value !== "" && !child.value.startsWith('std')) {
+            elements.push(child.value); 
+          }
+          else {
+            const childElements = this.extractArrayElements(child); // Llamada recursiva para obtener elementos de arrays anidados
+            for (const childElement of childElements) {
+              elements.push(childElement); // Agregar elementos anidados a la lista de elementos
+            }
+          }
+        }
+
+        return elements;
+      }
 
 }
 

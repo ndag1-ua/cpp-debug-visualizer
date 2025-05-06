@@ -54,6 +54,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 				// pasar scope locals a app y visualizar
 				if (locals) {
+					console.log("VARIABLES:");
+					console.log(JSON.stringify(locals.variables, null, 2));
 					app.createDataList(locals.variables);
 					
 				}

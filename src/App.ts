@@ -9,6 +9,7 @@ import { PointerDataCreator } from "./data-creator/PointerDataCreator";
 import { FullRenderer } from "./data-visitor/FullRenderer";
 import { OnlyTypesRenderer } from "./data-visitor/OnlyTypesRenderer";
 import { SIMPLE_TYPES } from './types';
+import { ARRAY_TYPES } from './types';
 
 export class App {
   private dataList: Data[] = [];
@@ -97,9 +98,9 @@ export class App {
     
     if (SIMPLE_TYPES.has(variable.type)) {
       return new SimpleDataCreator().create(variable); 
-    } else {
-      return null; // No se crea un objeto Data para tipos no simples
-    }
+    } else if (ARRAY_TYPES.has(variable.type.split("<")[0]) || /\[[0-9]+\]/.test(variable.type)) {
+      return new ArrayDataCreator().create(variable); 
+    } else return null;
 
   }
 
