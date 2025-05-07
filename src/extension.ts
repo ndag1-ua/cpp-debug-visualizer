@@ -34,9 +34,15 @@ export function activate(context: vscode.ExtensionContext) {
 		const cssUri = panel.webview.asWebviewUri(
 			vscode.Uri.file(path.join(context.extensionPath, 'media', 'style.css'))
 		);
+
+		const scriptUri = panel.webview.asWebviewUri(
+			vscode.Uri.file(path.join(context.extensionPath, 'media', 'leader-line.min.js'))
+		);
+		  
 		const htmlPath = path.join(context.extensionPath, 'media', 'webview.html');
 		let html = fs.readFileSync(htmlPath, 'utf8');
 		html = html.replace('${cssUri}', cssUri.toString());
+		html = html.replace('${scriptUri}', scriptUri.toString());
 		panel.webview.html = html;
 
 		panel.webview.onDidReceiveMessage(async (message) => {

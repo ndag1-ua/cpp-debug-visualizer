@@ -1,15 +1,8 @@
 
 import { Data } from "./data/Data";
-import { DataVisitor } from "./data-visitor/DataVisitor";
-import { DataCreator } from "./data-creator/DataCreator";
-import { ArrayDataCreator } from "./data-creator/ArrayDataCreator";
-import { SimpleDataCreator } from "./data-creator/SimpleDataCreator";
-import { ComplexDataCreator } from "./data-creator/ComplexDataCreator";
-import { PointerDataCreator } from "./data-creator/PointerDataCreator";
 import { FullRenderer } from "./data-visitor/FullRenderer";
 import { OnlyTypesRenderer } from "./data-visitor/OnlyTypesRenderer";
-import { SIMPLE_TYPES } from './types';
-import { ARRAY_TYPES } from './types';
+import { createData } from "./utils";
 
 export class App {
   private dataList: Data[] = [];
@@ -83,7 +76,7 @@ export class App {
     this.dataList.length = 0;
     //Crear nuevo data
     for (const variable of data) {
-      const createdData = this.createData(variable);
+      const createdData = createData(variable);
       if (createdData) {
         console.log("Created data: name "+ createdData.name + " type: " + createdData.type);
         this.dataList.push(createdData);
@@ -91,17 +84,6 @@ export class App {
     }
   }
 
-  createData(variable: any): Data | null {
-    if (variable === undefined || variable === null) {
-      return null;
-    }
-    
-    if (SIMPLE_TYPES.has(variable.type)) {
-      return new SimpleDataCreator().create(variable); 
-    } else if (ARRAY_TYPES.has(variable.type.split("<")[0]) || /\[[0-9]+\]/.test(variable.type)) {
-      return new ArrayDataCreator().create(variable); 
-    } else return null;
-
-  }
+  
 
 }

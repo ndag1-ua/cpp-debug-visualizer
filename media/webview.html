@@ -6,6 +6,7 @@
 	<title>C++ Debug Visualizer</title>
 
 	<link href="${cssUri}" rel="stylesheet">
+	<script src="${scriptUri}"></script>
 	  
 </head>
 <body>
@@ -61,6 +62,10 @@
 
 			// Actualizar las filas del grid
 			container.style.gridTemplateRows = `${topHeight}px 5px ${bottomHeight}px`;
+
+			if (window._pointerLines) {
+				window._pointerLines.forEach(({ line }) => line.position());
+			}
 		});
 
         function requestUpdate() {
@@ -70,6 +75,7 @@
         window.addEventListener('message', event => {
             if (event.data.type === 'variables') {
                 document.getElementById('bottom-data').innerHTML = event.data.data;
+				drawPointerLines();
             }
         });
 
@@ -111,11 +117,59 @@
 				offsetY = Math.max(minY, Math.min(maxY, offsetY));
 
 				content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+				if (window._pointerLines) {
+				window._pointerLines.forEach(({ line }) => line.position());
+				}
 			});
+
 		}
 
 		makeDraggableScroll('top');
 		makeDraggableScroll('bottom');
+
+		function drawPointerLines() {
+			// Quitar líneas anteriores
+			if (window._pointerLines) {
+				window._pointerLines.forEach(line => line.remove());
+			}
+			window._pointerLines = [];
+
+			document.querySelectorAll('[id^="from-"]').forEach(fromEl => {
+				const uid = fromEl.id.replace('from-', '');
+				const toEl = document.getElementById(`to-${uid}`);
+
+				console.log(`fromEl: ${fromEl.id}, toEl: ${toEl ? toEl.id : 'null'}`);
+
+				if (toEl) {
+				const line = new LeaderLine(
+					fromEl,
+					toEl,
+					{
+					startSocket: 'bottom',
+					endSocket: 'top',
+					color: 'white',
+					path: 'straight',
+					startPlug: 'behind',
+					endPlug: 'arrow1',
+					size: 2
+					}
+				);
+				// Guarda también los elementos para poder actualizar después
+				window._pointerLines.push({ line, fromEl, toEl });
+				}
+			});
+		}
+
+		window.addEventListener('resize', () => {
+			if (window._pointerLines) {
+				window._pointerLines.forEach(({ line }) => line.position());
+			}
+		});
+
+
+
+
+
 
 	</script>
 </body>

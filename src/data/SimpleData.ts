@@ -6,7 +6,7 @@ export class SimpleData extends Data {
         super(name, type);
     }
 
-    accept(visitor: DataVisitor): string {
+    accept(visitor: DataVisitor): string{
         return visitor.visitSimple(this);
     }
 

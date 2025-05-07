@@ -2,6 +2,7 @@
 import { Data } from '../data/Data';
 import { DataCreator } from './DataCreator';
 import { ComplexData } from '../data/ComplexData';
+import { createData } from '../utils';
 
 export class ComplexDataCreator extends DataCreator {
     create(variable: any): ComplexData {

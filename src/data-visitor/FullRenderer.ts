@@ -16,17 +16,26 @@ export class FullRenderer implements DataVisitor {
   }
   
   visitPointer(data: PointerData): string {
-    const element = document.createElement("div");
-    element.innerHTML = `<strong>${data.name}</strong>: ${data.address} (${data.type})`;
-    return element.outerHTML;
+    const uid = `${data.name}-${Math.random().toString(36).substring(2, 8)}`;
+  
+    const fromAttr = `id="from-${uid}"`;
+    const toAttr = `id="to-${uid}"`;
+  
+    return `
+      <div class="pointer-wrapper">
+        <div class="data-item" ${fromAttr}>
+          <div class="data-header">${data.name}: ${data.type}</div>
+          <div class="data-box">${data.address}</div>
+        </div>
+        ${data.pointsTo ? `<div ${toAttr}>${data.pointsTo.accept(this)}</div>` : ""}
+      </div>
+    `;
   }
+  
 
   visitComplex(data: ComplexData): string {
-      const element = document.createElement("div");
-      element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-      const elementsList = document.createElement("ul");
-      element.appendChild(elementsList);
-      return element.outerHTML;
+    return `
+  `;
   }
 
   visitArray(data: ArrayData): string {
