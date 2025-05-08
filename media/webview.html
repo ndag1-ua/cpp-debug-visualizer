@@ -19,8 +19,7 @@
 		</div>
 		<div id="divider"></div>
 		<div id="bottom" class="drag-container">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Variables</h2>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <button onclick="requestUpdate()">Update</button>
             </div>
             <div id="bottom-data" class="canvas-content">
@@ -63,9 +62,7 @@
 			// Actualizar las filas del grid
 			container.style.gridTemplateRows = `${topHeight}px 5px ${bottomHeight}px`;
 
-			if (window._pointerLines) {
-				window._pointerLines.forEach(({ line }) => line.position());
-			}
+			updateAllLines();
 		});
 
         function requestUpdate() {
@@ -75,6 +72,13 @@
         window.addEventListener('message', event => {
             if (event.data.type === 'variables') {
                 document.getElementById('bottom-data').innerHTML = event.data.data;
+				drawPointerLines();
+            }
+        });
+
+		window.addEventListener('message', event => {
+            if (event.data.type === 'data-types') {
+                document.getElementById('top-data').innerHTML = event.data.data;
 				drawPointerLines();
             }
         });
@@ -117,9 +121,7 @@
 				offsetY = Math.max(minY, Math.min(maxY, offsetY));
 
 				content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-				if (window._pointerLines) {
-				window._pointerLines.forEach(({ line }) => line.position());
-				}
+				updateAllLines();
 			});
 
 		}
@@ -145,10 +147,11 @@
 					fromEl,
 					toEl,
 					{
+					container: document.querySelector('#bottom-data'),
 					startSocket: 'bottom',
 					endSocket: 'top',
 					color: 'white',
-					path: 'straight',
+					path: 'fluid',
 					startPlug: 'behind',
 					endPlug: 'arrow1',
 					size: 2
@@ -160,15 +163,38 @@
 			});
 		}
 
-		window.addEventListener('resize', () => {
-			if (window._pointerLines) {
-				window._pointerLines.forEach(({ line }) => line.position());
+		function updateAllLines() {
+			for (const { line, fromEl, toEl } of window._pointerLines) {
+				if (fromEl && toEl) {
+					line.position();
+				} else {
+					line.remove(); // Elimina la línea si uno de los elementos no existe
+					window._pointerLines = window._pointerLines.filter(l => l.line !== line); // Actualiza el array
+				}
 			}
+		}
+
+
+		window.addEventListener('resize', () => {
+			updateAllLines();
 		});
 
+		document.addEventListener("click", (event) => {
+			const target = event.target;
+			if (target.classList.contains("type-toggle")) {
+				const type = target.dataset.type;
+				if (!type) return;
 
+				// Alternar estado visual
+				target.classList.toggle("active");
+				target.classList.toggle("inactive");
 
+				// Notificar al backend si es necesario
+				vscode.postMessage({ type: "toggle-type", payload: type });
+			}
 
+			updateAllLines();
+		});
 
 
 	</script>

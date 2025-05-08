@@ -8,10 +8,19 @@ export class ComplexDataCreator extends DataCreator {
     create(variable: any): ComplexData {
         const name = variable.name || variable.evaluateName || variable.value;
         const type = variable.type || typeof variable.value;
-        const value = variable.value !== undefined ? variable.value : null;
-        const complex = variable.complex || null; // Assuming complex is a property of the variable
+        const elements: Data[] = [];
 
-        return new ComplexData(name, type, value);
+        for (const child of variable.children) {
+            const data = createData(child);
+            if (data) {
+                elements.push(data);
+            }
+        }
+        if (elements.length === 0) {    
+            return new ComplexData(name, type, []);
+        }
+
+        return new ComplexData(name, type, elements);
     }
 
 }

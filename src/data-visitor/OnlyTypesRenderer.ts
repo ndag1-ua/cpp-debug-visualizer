@@ -6,31 +6,42 @@ import { ComplexData } from "../data/ComplexData";
 import { ArrayData } from "../data/ArrayData";
 
 export class OnlyTypesRenderer implements DataVisitor {
+  constructor(private activeTypes: Map<string, boolean>) {}
+
+  private renderButton(type: string, label?: string): string {
+    const isActive = this.activeTypes.get(type) ?? true; // por defecto activo si no existe
+    const className = `type-toggle${isActive ? ' active' : ''}`;
+    return `<button class="${className}" data-type="${type}">${label ?? type}</button>`;
+  }
+
   visitSimple(data: SimpleData): string {
-    const element = document.createElement("div");
-    element.innerHTML = `<strong>${data.name}</strong>: ${data.value} (${data.type})`;
-    return element.outerHTML;
+    return this.renderButton(data.type);
   }
 
   visitPointer(data: PointerData): string {
-    const element = document.createElement("div");
-    element.innerHTML = `<strong>${data.name}</strong>: ${data.address} (${data.type})`;
-    return element.outerHTML;
+    return this.renderButton(data.type);
   }
 
-    visitComplex(data: ComplexData): string {
-        const element = document.createElement("div");
-        element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-        const elementsList = document.createElement("ul");
-        element.appendChild(elementsList);
-        return element.outerHTML;
-    }
+  visitArray(data: ArrayData): string {
+    const label = `${data.type} (${data.rows}x${data.columns})`;
+    return this.renderButton(data.type, label);
+  }
 
-    visitArray(data: ArrayData): string {
-        const element = document.createElement("div");
-        element.innerHTML = `<strong>${data.name}</strong> (${data.type})`;
-        const elementsList = document.createElement("ul");
-        element.appendChild(elementsList);
-        return element.outerHTML;
-    }
+  visitComplex(data: ComplexData): string {
+    const typeButton = this.renderButton(data.type);
+
+    const memberButtons = data.elements.map(elem => {
+      const key = `${data.type}.${elem.name}`;
+      return this.renderButton(key);
+    }).join("\n");
+
+    return `
+      <div class="complex-type">
+        ${typeButton}
+        <div class="member-buttons">
+          ${memberButtons}
+        </div>
+      </div>
+    `;
+  }
 }

@@ -20,6 +20,12 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 		vscode.window.showInformationMessage('C++ Debug Visualizer Opened!');
+
+		let app: App | undefined;
+		if (!app) {
+			app = new App();
+		}
+
 		var panel = vscode.window.createWebviewPanel(
 			'cppDebugVisualizer', // Identifies the type of the webview. Used internally
 			'C++ Debug Visualizer', // Title of the panel displayed to the user
@@ -54,7 +60,6 @@ export function activate(context: vscode.ExtensionContext) {
 			  if (session) {
 				const variables = await getVariablesFromSession(session);
 				// Aqui es donde se filtran los scopes
-				const app = new App();
 				// coger el scope locals
 				const locals = variables.find((scope) => scope.scope === 'Locals');
 
@@ -67,11 +72,26 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				
 				const htmlData = app.visualizeData();
-
+				const htmlDataTypes = app.visualizeDataTypes();
 				panel.webview.postMessage({ type: 'variables', data: htmlData });
+				panel.webview.postMessage({ type: 'data-types', data: htmlDataTypes });
 			  }
 			}
 		});
+
+		panel.webview.onDidReceiveMessage(message => {
+			if (message.type === 'toggle-type') {
+			  const type = message.payload;
+			  const current = app.isActiveType(type);
+			  app.setActiveType(type, !current); // Alternar estado
+			  console.log(`Tipo ${type} ahora está ${!current ? "activo" : "inactivo"}`);
+			  
+			  // Si quieres volver a renderizar con el filtro aplicado:
+			  const htmlData = app.visualizeData(); 
+			  panel.webview.postMessage({ type: 'variables', data: htmlData });
+			}
+		  });
+		  
 	});
 
 	context.subscriptions.push(disposable);
@@ -86,11 +106,30 @@ async function expandVariable(session: vscode.DebugSession, variable: any): Prom
 		variablesReference: variable.variablesReference
 		});
 
+		// Verificar si es necesario expandir (todos los punteros tienen valor vacio)
+		let expandable = false;
+		for (const child of response.variables) {
+			// Si la variable no tiene type, ignorarla
+			if (!child.type) continue;
+			if (child.type.includes("*") && child.value !== "0x0" && child.value !== "") {
+				expandable = true;
+				break;
+			}
+
+		}
+
 		expanded.children = [];
 
-		for (const child of response.variables) {
-		const fullChild = await expandVariable(session, child);  // llamada recursiva
-		expanded.children.push(fullChild);
+		if (expandable) {
+			for (const child of response.variables) {
+				const fullChild = await expandVariable(session, child);  // llamada recursiva
+				expanded.children.push(fullChild);
+			}
+		}
+		else {
+			for (const child of response.variables) {
+				expanded.children.push(child);
+			}
 		}
 	}
   
@@ -101,13 +140,16 @@ async function expandVariable(session: vscode.DebugSession, variable: any): Prom
 async function getVariablesFromSession(session: vscode.DebugSession) {
 	const threads = await session.customRequest('threads');
 	const threadId = threads.threads[0]?.id;
+	console.log("THREAD ID: ", threadId);
 	if (!threadId) return [];
 
 	const stack = await session.customRequest('stackTrace', { threadId });
 	const frameId = stack.stackFrames[0]?.id;
+	console.log("FRAME ID: ", frameId);
 	if (!frameId) return [];
 
 	const scopesResponse = await session.customRequest('scopes', { frameId });
+	console.log("SCOPES: ", scopesResponse);
 
 	const data = [];
 
@@ -122,6 +164,7 @@ async function getVariablesFromSession(session: vscode.DebugSession) {
 			const fullVar = await expandVariable(session, variable);
 			expandedVariables.push(fullVar);
 		}
+
 
 		data.push({
 			scope: scope.name,
