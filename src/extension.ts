@@ -44,6 +44,7 @@ export function activate(context: vscode.ExtensionContext) {
 		const scriptUri = panel.webview.asWebviewUri(
 			vscode.Uri.file(path.join(context.extensionPath, 'media', 'leader-line.min.js'))
 		);
+		
 		  
 		const htmlPath = path.join(context.extensionPath, 'media', 'webview.html');
 		let html = fs.readFileSync(htmlPath, 'utf8');

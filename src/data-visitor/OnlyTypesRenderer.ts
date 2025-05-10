@@ -36,11 +36,9 @@ export class OnlyTypesRenderer implements DataVisitor {
     }).join("\n");
 
     return `
-      <div class="complex-type">
+      <div class="member-buttons">
         ${typeButton}
-        <div class="member-buttons">
-          ${memberButtons}
-        </div>
+        ${memberButtons}
       </div>
     `;
   }

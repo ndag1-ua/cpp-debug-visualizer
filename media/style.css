@@ -23,13 +23,17 @@ html, body {
 
 #top {
   z-index: 10;
-  
+}
+
+#top-data, #bottom-data {
+  transform-origin: center;
 }
 
 #divider {
   background: var(--vscode-editorGroup-border);
   cursor: row-resize;
-  height: 5px;
+  height: 1px;
+  z-index: 10;
 }
 
 /* === DRAG PANEL SYSTEM === */
@@ -94,30 +98,36 @@ html, body {
   min-width: 80px;
 }
 
-/* === BOTÓN ACTUALIZAR === */
 
-#button {
-  background-color: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: 1px solid var(--vscode-button-border, transparent);
-  padding: 8px 20px;
+/* === BOTÓN ACTUALIZAR === */
+#update-button {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background-color: var(--vscode-editorWidget-border);
+  color: var(--vscode-editorWidget-foreground);
+  border: 1px solid var(--vscode-editorWidget-border);
+  padding: 8px 18px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   transition: background-color 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  z-index: 10;
 }
 
-#button:hover {
-  background-color: var(--vscode-button-hoverBackground);
+#update-button:hover {
+  background-color: color-mix(in srgb, var(--vscode-editorWidget-border) 85%, black);
+  border: 1px solid color-mix(in srgb, var(--vscode-editorWidget-border) 85%, black);
   transform: translateY(-1px);
 }
 
-#button:active {
+#update-button:active {
   transform: translateY(1px);
   box-shadow: none;
 }
+
 
 /* === POINTER DATA === */
 
@@ -128,6 +138,7 @@ html, body {
   align-items: center;
   justify-content: center;
   height: min-content;
+  width: 100%;
 }
 
 .pointer-wrapper .data-item:first-child {
@@ -164,23 +175,28 @@ html, body {
 /* === TYPE TOGGLE BUTTONS === */
 
 .type-toggle {
-  background-color: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: 1px solid var(--vscode-button-border, transparent);
+  background-color: var(--vscode-editorWidget-border);
+  color: var(--vscode-editorWidget-foreground);
+  border: 1px solid var(--vscode-editorWidget-border);
   border-radius: 6px;
   padding: 6px 12px;
   margin: 6px;
   font-size: 13px;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  height: fit-content;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .type-toggle:hover {
-  background-color: var(--vscode-button-hoverBackground);
+  background-color: color-mix(in srgb, var(--vscode-editorWidget-border) 85%, black);
+  border: 1px solid color-mix(in srgb, var(--vscode-editorWidget-border) 85%, black);
+  transform: translateY(-1px);
 }
 
 .type-toggle.active {
-  box-shadow: 0 0 0 2px var(--vscode-focusBorder, #007acc);
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .type-toggle.inactive {
@@ -190,16 +206,8 @@ html, body {
   text-decoration: line-through;
 }
 
-/* === COMPLEX TYPE LAYOUT === */
 
-.complex-type {
-  display: inline-block;
-  margin: 10px;
-  padding: 8px;
-  border: 2px dashed var(--vscode-editorWidget-border);
-  border-radius: 8px;
-  background-color: var(--vscode-editorWidget-background);
-}
+/* === COMPLEX TYPE LAYOUT === */
 
 .member-buttons {
   display: flex;

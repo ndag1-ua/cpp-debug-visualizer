@@ -23,9 +23,9 @@ export class FullRenderer implements DataVisitor {
   
     return `
       <div class="pointer-wrapper">
-        <div class="data-item" ${fromAttr}>
+        <div class="data-item">
           <div class="data-header">${data.name}: ${data.type}</div>
-          <div class="data-box">${data.address}</div>
+          <div class="data-box" ${fromAttr}>${data.address}</div>
         </div>
         ${data.pointsTo ? `<div ${toAttr}>${data.pointsTo.accept(this)}</div>` : ""}
       </div>
@@ -50,9 +50,9 @@ export class FullRenderer implements DataVisitor {
   
         // Header (solo la dirección)
         pointerHeaders += `
-          <div class="data-item" id="${fromId}">
+          <div class="data-item">
             <div class="data-header">${element.name}: ${element.type}</div>
-            <div class="data-box">${element.address}</div>
+            <div class="data-box" id="${fromId}">${element.address}</div>
           </div>
         `;
   
@@ -90,9 +90,8 @@ export class FullRenderer implements DataVisitor {
   visitArray(data: ArrayData): string {
     return `
       <div class="data-item">
-        <div class="data-header">${data.name}: ${data.type} ${data.rows} x ${data.columns}</div>
+        <div class="data-header">${data.name}: ${data.type}</div>
         <div class="data-box">[${data.elements.map((element) => element.toString()).join(", ")}]</div>
-
       </div>
     `;
   }

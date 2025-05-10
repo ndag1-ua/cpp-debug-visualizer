@@ -19,8 +19,8 @@
 		</div>
 		<div id="divider"></div>
 		<div id="bottom" class="drag-container">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <button onclick="requestUpdate()">Update</button>
+            <div style="display: flex; justify-content: space-between; align-items: right;">
+                <button id="update-button" onclick="requestUpdate()">Update</button>
             </div>
             <div id="bottom-data" class="canvas-content">
 				<!-- Aquí meterás el contenido HTML generado de App.visualizeData() -->
@@ -62,7 +62,8 @@
 			// Actualizar las filas del grid
 			container.style.gridTemplateRows = `${topHeight}px 5px ${bottomHeight}px`;
 
-			updateAllLines();
+			requestAnimationFrame(updateAllLines);
+
 		});
 
         function requestUpdate() {
@@ -83,6 +84,15 @@
             }
         });
 
+		// Variables para el zoom
+		let scale = 1;
+		const zoomStep = 0.1;
+		const minScale = 0.5;
+		const maxScale = 2;
+		
+		// Variables para mantener la posición durante el arrastre
+		let translateX = 0, translateY = 0;
+		
 		function makeDraggableScroll(containerId) {
 			const container = document.getElementById(containerId);
 			const content = container.querySelector('.canvas-content');
@@ -91,9 +101,21 @@
 			let startX, startY;
 			let offsetX = 0, offsetY = 0;
 
+			if (containerId === 'bottom') {
+				content.style.transformOrigin = 'top left';
+			}
+
 			container.addEventListener('mousedown', (e) => {
+				if (e.target.closest('.type-toggle') || e.target.closest('button')) return;
 				isDragging = true;
 				container.classList.add('dragging');
+
+				// Obtener transformaciones actuales
+				const style = window.getComputedStyle(content);
+				const matrix = new DOMMatrix(style.transform);
+				offsetX = matrix.m41;
+				offsetY = matrix.m42;
+
 				startX = e.clientX - offsetX;
 				startY = e.clientY - offsetY;
 			});
@@ -110,21 +132,37 @@
 				offsetX = e.clientX - startX;
 				offsetY = e.clientY - startY;
 
-				// Límites de desplazamiento
-				const minX = Math.min(0, container.clientWidth - content.scrollWidth);
-				const maxX = 0;
-				const minY = Math.min(0, container.clientHeight - content.scrollHeight);
-				const maxY = 0;
+				// ==== LÍMITES DE MARGEN ====
+				const margin = 100;
+				const scaleFactor = (containerId === 'bottom') ? scale : 1;
 
-				// Aplicar límites
+				const contentWidth = content.scrollWidth * scaleFactor;
+				const contentHeight = content.scrollHeight * scaleFactor;
+				const viewWidth = container.clientWidth;
+				const viewHeight = container.clientHeight;
+
+				const minX = viewWidth - contentWidth - margin;
+				const maxX = margin;
+				const minY = viewHeight - contentHeight - margin;
+				const maxY = margin;
+
 				offsetX = Math.max(minX, Math.min(maxX, offsetX));
 				offsetY = Math.max(minY, Math.min(maxY, offsetY));
+				// ===========================
 
-				content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+				// Aplicar transformación
+				if (containerId === 'bottom') {
+					translateX = offsetX;
+					translateY = offsetY;
+					content.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+				} else {
+					content.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+				}
+
 				updateAllLines();
 			});
-
 		}
+
 
 		makeDraggableScroll('top');
 		makeDraggableScroll('bottom');
@@ -151,10 +189,10 @@
 					startSocket: 'bottom',
 					endSocket: 'top',
 					color: 'white',
-					path: 'fluid',
+					path: 'straight',
 					startPlug: 'behind',
 					endPlug: 'arrow1',
-					size: 2
+					size: 2,
 					}
 				);
 				// Guarda también los elementos para poder actualizar después
@@ -164,8 +202,17 @@
 		}
 
 		function updateAllLines() {
+			if (!window._pointerLines) return;
+			
 			for (const { line, fromEl, toEl } of window._pointerLines) {
 				if (fromEl && toEl) {
+					line.setOptions({
+						start: fromEl,
+						end: toEl,
+						size: 2 * scale, // ajusta grosor
+						startPlugSize: 1 * scale,
+						endPlugSize: 1 * scale,
+					});
 					line.position();
 				} else {
 					line.remove(); // Elimina la línea si uno de los elementos no existe
@@ -173,7 +220,6 @@
 				}
 			}
 		}
-
 
 		window.addEventListener('resize', () => {
 			updateAllLines();
@@ -196,6 +242,61 @@
 			updateAllLines();
 		});
 
+		// Implementación de zoom centrado en la zona visible
+		const bottomContainer = document.getElementById('bottom');
+		const bottomContent = document.querySelector('#bottom .canvas-content');
+		
+		// Controlador para el zoom
+		document.addEventListener('wheel', (e) => {
+			if (e.target.closest('#bottom')) {
+				e.preventDefault();
+
+				// Obtener el centro visible del contenedor
+				const rect = bottomContainer.getBoundingClientRect();
+				const centerX = rect.width / 2;
+				const centerY = rect.height / 2;
+
+				// Guardar transformaciones anteriores
+				const oldScale = scale;
+
+				// Ajustar escala
+				if (e.deltaY < 0) {
+					scale = Math.min(maxScale, scale + zoomStep);
+				} else {
+					scale = Math.max(minScale, scale - zoomStep);
+				}
+
+				const zoomRatio = scale / oldScale;
+
+				// Obtener transform actual
+				const style = window.getComputedStyle(bottomContent);
+				const matrix = new DOMMatrix(style.transform);
+				let tx = matrix.m41;
+				let ty = matrix.m42;
+
+				// Recalcular translate para mantener centrado
+				tx = centerX - (centerX - tx) * zoomRatio;
+				ty = centerY - (centerY - ty) * zoomRatio;
+
+				// Definir límites
+				const margin = 100; // Espacio mínimo visible (puedes ajustarlo)
+
+				// Limitar los valores de translate
+				tx = Math.min(margin, Math.max(bottomContainer.clientWidth - bottomContent.scrollWidth * scale - margin, tx));
+				ty = Math.min(margin, Math.max(bottomContainer.clientHeight - bottomContent.scrollHeight * scale - margin, ty));
+
+
+				// Aplicar
+				bottomContent.style.transformOrigin = 'top left';
+				bottomContent.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+
+				// Guardar los valores
+				translateX = tx;
+				translateY = ty;
+
+				updateAllLines();
+			}
+		});
 
 	</script>
 </body>

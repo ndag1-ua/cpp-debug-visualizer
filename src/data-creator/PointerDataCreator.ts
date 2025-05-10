@@ -26,16 +26,21 @@ export class PointerDataCreator extends DataCreator {
             if (variable.children.length === 1 && looksSimple) {
                 // Solo un hijo y parece tipo simple
                 pointer = createData(child);
+            } else if (variable.children.length === 1 && child.type.includes('*')) {
+                // Solo un hijo y parece puntero
+                pointer = createData(child);
             } else {
                 // Probablemente una clase con al menos un campo
                 const complex: any = {
-                    name: `*${name}`,
+                    name: variable.name,
                     type: type.replace('*', '').trim(),
                     children: variable.children
                 };
                 pointer = createData(complex);
             }
         }
+
+        console.log("PointerData: ", name, type, value, pointer);
 
         return new PointerData(name, type, value, pointer);
 
