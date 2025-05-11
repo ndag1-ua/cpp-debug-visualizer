@@ -77,7 +77,7 @@ html, body {
   margin: 10px;
   position: relative;
   height: min-content;
-  width: min-content;
+  width: auto;
   justify-content: center;
 }
 
@@ -87,6 +87,9 @@ html, body {
   color: var(--vscode-editorWidget-foreground);
   text-align: left;
   padding-left: 5px;
+  width: auto;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .data-box {
@@ -183,9 +186,14 @@ html, body {
   margin: 6px;
   font-size: 13px;
   cursor: pointer;
-  height: fit-content;
+  min-height: 30px;
+  height: min-content;
+  width: auto;
+  max-width: 200px;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .type-toggle:hover {
@@ -207,14 +215,22 @@ html, body {
 }
 
 
-/* === COMPLEX TYPE LAYOUT === */
+/* === COMPLEX BUTTONS LAYOUT === */
+
+.complex-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  height: min-content;
+}
 
 .member-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
   justify-content: flex-start;
+  border: 2px dashed var(--vscode-editorWidget-border);
+  border-radius: 8px;
+  background-color: var(--vscode-editorWidget-background);
 }
 
 

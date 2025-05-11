@@ -6,6 +6,8 @@ import { ComplexData } from "../data/ComplexData";
 import { ArrayData } from "../data/ArrayData";
 
 export class FullRenderer implements DataVisitor {
+  constructor(private activeTypes: Map<string, boolean>) {}
+
   visitSimple(data: SimpleData): string {
     return `
       <div class="data-item">
@@ -35,15 +37,25 @@ export class FullRenderer implements DataVisitor {
 
   visitComplex(data: ComplexData): string {
     const scalarHtml = data.elements
-      .filter(elem => !(elem instanceof PointerData))
-      .map(elem => elem.accept(this))
-      .join("");
+    .filter(elem => !(elem instanceof PointerData))
+    .filter(elem => {
+      const key = `${data.type}.${elem.name}`;
+      return this.activeTypes.get(key) !== false;
+    })
+    .map(elem => elem.accept(this))
+    .join("");
+
   
     let pointerHeaders = "";
     let pointerBlocks = "";
   
     for (const element of data.elements) {
       if (element instanceof PointerData) {
+        // SI no esta activo, no renderizar tipo (TipoPadre.TipoHijo)
+        const buttonName = data.type + "." + element.name;
+        const isActive = this.activeTypes.get(buttonName);
+        if (isActive === false) continue;
+
         const uid = `${element.name}-${Math.random().toString(36).substring(2, 8)}`;
         const fromId = `from-${uid}`;
         const toId = `to-${uid}`;

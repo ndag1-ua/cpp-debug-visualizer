@@ -85,13 +85,14 @@ export function activate(context: vscode.ExtensionContext) {
 			  const type = message.payload;
 			  const current = app.isActiveType(type);
 			  app.setActiveType(type, !current); // Alternar estado
+			  
 			  console.log(`Tipo ${type} ahora está ${!current ? "activo" : "inactivo"}`);
 			  
-			  // Si quieres volver a renderizar con el filtro aplicado:
-			  const htmlData = app.visualizeData(); 
-			  panel.webview.postMessage({ type: 'variables', data: htmlData });
+			  // LLamar a variables 
+			  panel.webview.postMessage({ type: 'variables', data: app.visualizeData() });
 			}
-		  });
+			
+		});
 		  
 	});
 

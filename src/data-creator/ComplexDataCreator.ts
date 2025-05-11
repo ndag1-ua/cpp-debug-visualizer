@@ -10,16 +10,17 @@ export class ComplexDataCreator extends DataCreator {
         const type = variable.type || typeof variable.value;
         const elements: Data[] = [];
 
+        // verificar si tiene children
+        if (!variable.children || variable.children.length === 0) {
+            return new ComplexData(name, type, []);
+        }
+
         for (const child of variable.children) {
             const data = createData(child);
             if (data) {
                 elements.push(data);
             }
         }
-        if (elements.length === 0) {    
-            return new ComplexData(name, type, []);
-        }
-
         return new ComplexData(name, type, elements);
     }
 

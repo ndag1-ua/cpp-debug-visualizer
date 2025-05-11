@@ -7,11 +7,11 @@ export const SIMPLE_TYPES = new Set<string>([
 ]);
 
 export const ARRAY_TYPES = new Set<string>([
-    "std::array", "std::vector", "std::deque", "std::list", "std::set", "std::map",
-    "std::unordered_set", "std::unordered_map", "std::bitset", "std::valarray",
-    "std::forward_list", "std::queue", "std::stack", "std::priority_queue", "std::multiset",
-    "std::multimap", "std::unordered_multiset", "std::unordered_multimap", "std::array_view",
-    "std::span"
+    "array", "vector", "deque", "list", "set", "map",
+    "unordered_set", "unordered_map", "bitset", "valarray",
+    "forward_list", "queue", "stack", "priority_queue", "multiset",
+    "multimap", "unordered_multiset", "unordered_multimap", "array_view",
+    "span"
 ]);
 
   

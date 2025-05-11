@@ -70,10 +70,13 @@
             vscode.postMessage({ type: 'update-variables' });
         }
 
+		// Recibir mensajes del backend
+
         window.addEventListener('message', event => {
             if (event.data.type === 'variables') {
                 document.getElementById('bottom-data').innerHTML = event.data.data;
 				drawPointerLines();
+				console.log('hola');
             }
         });
 
@@ -170,7 +173,7 @@
 		function drawPointerLines() {
 			// Quitar líneas anteriores
 			if (window._pointerLines) {
-				window._pointerLines.forEach(line => line.remove());
+				window._pointerLines.forEach(({ line }) => line.remove());
 			}
 			window._pointerLines = [];
 
@@ -192,7 +195,9 @@
 					path: 'straight',
 					startPlug: 'behind',
 					endPlug: 'arrow1',
-					size: 2,
+					size: 2 * scale,
+					startPlugSize: 1 * scale,
+					endPlugSize: 1 * scale,
 					}
 				);
 				// Guarda también los elementos para poder actualizar después
@@ -238,8 +243,6 @@
 				// Notificar al backend si es necesario
 				vscode.postMessage({ type: "toggle-type", payload: type });
 			}
-
-			updateAllLines();
 		});
 
 		// Implementación de zoom centrado en la zona visible

@@ -41,10 +41,12 @@ export class App {
   }
 
   visualizeData(): string {
-    const renderer = new FullRenderer();
+    const renderer = new FullRenderer(this.activeTypes);
     let html = "";
   
     for (const data of this.dataList) {
+      // Si el tipo no está activo, no lo renderizamos
+      if (!this.activeTypes.get(data.type)) continue;
       const rendered = data.accept(renderer); // esto devuelve un string
       html += rendered + "\n";
     }
@@ -56,11 +58,14 @@ export class App {
   visualizeDataTypes(): string {
     const renderer = new OnlyTypesRenderer(this.activeTypes);
     let html = "";
-  
+    const seen = new Set<string>();
+
     for (const data of this.dataList) {
-      const rendered = data.accept(renderer); // esto devuelve un string
-      html += rendered + "\n";
+      if (seen.has(data.type)) continue;
+      seen.add(data.type);
+      html += data.accept(renderer) + "\n";
     }
+
     return html;
   }
 
@@ -91,6 +96,8 @@ export class App {
               const wasActive = previousTypes.get(attrTypeKey);
               this.activeTypes.set(attrTypeKey, wasActive !== false);
             }
+            console.log("Registrando tipo miembro:", `${createdData.type}.${attr.name}`);
+
           }
         }
       }

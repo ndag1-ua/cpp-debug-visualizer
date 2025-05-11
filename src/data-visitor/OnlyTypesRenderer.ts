@@ -8,10 +8,11 @@ import { ArrayData } from "../data/ArrayData";
 export class OnlyTypesRenderer implements DataVisitor {
   constructor(private activeTypes: Map<string, boolean>) {}
 
-  private renderButton(type: string, label?: string): string {
+  private renderButton(type: string): string {
     const isActive = this.activeTypes.get(type) ?? true; // por defecto activo si no existe
-    const className = `type-toggle${isActive ? ' active' : ''}`;
-    return `<button class="${className}" data-type="${type}">${label ?? type}</button>`;
+    const className = `type-toggle${isActive ? ' active' : ' inactive'}`;
+    console.log("type: ", type, " isActive: ", isActive, "\n");
+    return `<button class="${className}" data-type="${type}">${type}</button>`;
   }
 
   visitSimple(data: SimpleData): string {
@@ -23,8 +24,7 @@ export class OnlyTypesRenderer implements DataVisitor {
   }
 
   visitArray(data: ArrayData): string {
-    const label = `${data.type} (${data.rows}x${data.columns})`;
-    return this.renderButton(data.type, label);
+    return this.renderButton(data.type);
   }
 
   visitComplex(data: ComplexData): string {
@@ -36,9 +36,11 @@ export class OnlyTypesRenderer implements DataVisitor {
     }).join("\n");
 
     return `
-      <div class="member-buttons">
+      <div class="complex-buttons">
         ${typeButton}
+        <div class="member-buttons">
         ${memberButtons}
+        </div>
       </div>
     `;
   }
