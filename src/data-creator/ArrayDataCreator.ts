@@ -3,6 +3,7 @@ import { Data } from '../data/Data';
 import { ArrayData } from '../data/ArrayData';
 import { DataCreator } from './DataCreator';
 import { ARRAY_TYPES } from '../types';
+import { createData } from '../utils';
 
 export class ArrayDataCreator extends DataCreator {
   create(variable: any): ArrayData {
@@ -22,17 +23,18 @@ export class ArrayDataCreator extends DataCreator {
     const elements: any[] = [];
 
     for (const child of variable.children) {
-      if (child.name.startsWith('[') && child.name.endsWith(']') && child.value !== "" && !child.value.startsWith('std')) {
-        elements.push(child.value); 
-      }
-      else {
-        const childElements = this.extractArrayElements(child); // Llamada recursiva para obtener elementos de arrays anidados
-        for (const childElement of childElements) {
-          elements.push(childElement); // Agregar elementos anidados a la lista de elementos
+      if (child.name === '_M_elems') {
+        // Si el hijo es _M_elems, se asume que es un array de elementos
+        for (const elem of child.children) {
+          if (elem.name.startsWith('[') && elem.name.endsWith(']') && elem.value !== "" && !elem.value.startsWith('std')) {
+            elements.push(createData(elem)); // Crear datos a partir de la variable
+          }
         }
       }
+      else {
+        elements.push(createData(child)); 
+      }
     }
-
     return elements;
   }
 

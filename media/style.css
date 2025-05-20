@@ -148,6 +148,16 @@ html, body {
   margin-bottom: 40px;
 }
 
+/* === ARRAY DATA === */
+
+.array-data-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: 1rem;
+}
+
+
 /* === COMPLEX DATA === */
 
 .complex-data-box {

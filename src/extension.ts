@@ -108,29 +108,27 @@ async function expandVariable(session: vscode.DebugSession, variable: any): Prom
 		variablesReference: variable.variablesReference
 		});
 
-		// Verificar si es necesario expandir (todos los punteros tienen valor vacio)
-		let expandable = false;
-		for (const child of response.variables) {
-			// Si la variable no tiene type, ignorarla
-			if (!child.type) continue;
-			if (child.type.includes("*") && child.value !== "0x0" && child.value !== "") {
-				expandable = true;
-				break;
-			}
-
-		}
-
 		expanded.children = [];
 
-		if (expandable) {
-			for (const child of response.variables) {
-				const fullChild = await expandVariable(session, child);  // llamada recursiva
-				expanded.children.push(fullChild);
-			}
-		}
-		else {
-			for (const child of response.variables) {
+		for (const child of response.variables) {
+			if (!child.type) {
 				expanded.children.push(child);
+				continue;
+			}
+			const isPointer = child.type.includes("*");
+			const hasValue = child.value !== "0x0" && child.value !== "";
+
+			// Si el hijo parece expandible, expandirlo recursivamente
+			if (isPointer) {
+				if (hasValue) {
+					const fullChild = await expandVariable(session, child);
+					expanded.children.push(fullChild);
+				} else {
+					expanded.children.push(child);
+				}
+			} else {
+				const fullChild = await expandVariable(session, child);
+				expanded.children.push(fullChild);
 			}
 		}
 	}

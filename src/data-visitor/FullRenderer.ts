@@ -99,12 +99,19 @@ export class FullRenderer implements DataVisitor {
     `;
   }
 
-  visitArray(data: ArrayData): string {
-    return `
-      <div class="data-item">
-        <div class="data-header">${data.name}: ${data.type}</div>
-        <div class="data-box">[${data.elements.map((element) => element.toString()).join(", ")}]</div>
+ visitArray(data: ArrayData): string {
+  const elementsHtml = data.elements
+    .map(element => element.accept(this))
+    .join("");
+
+  return `
+    <div class="data-item">
+      <div class="data-header">${data.name}: ${data.type}</div>
+      <div class="complex-data-box">
+        ${elementsHtml}
       </div>
-    `;
-  }
+    </div>
+  `;
+}
+
 }
