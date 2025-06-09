@@ -1,71 +1,32 @@
-# cpp-debug-visualizer README
+# C++ Debug Visualizer
 
-This is the README for your extension "cpp-debug-visualizer". After writing up a brief description, we recommend including the following sections.
-
-## Features
-
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Extensión para Visual Studio Code que permite visualizar estructuras de datos en programas C++ durante la depuración, utilizando GDB como backend. El objetivo principal es ofrecer una representación gráfica clara e interactiva de variables complejas como punteros, clases, árboles, arreglos o estructuras anidadas.
 
 ---
 
-## Following extension guidelines
+## Estado del proyecto
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+Este proyecto está **en fase de desarrollo** y actualmente se encuentra en estado **prototipo funcional**. Algunas funcionalidades clave ya han sido implementadas, pero el soporte para ciertos tipos y estructuras está en proceso de mejora.
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+---
 
-## Working with Markdown
+## Características principales
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+- Visualización gráfica de estructuras de datos en tiempo de depuración.
+- Soporte para tipos simples, punteros, arreglos y clases.
+- Representación mediante nodos conectados con flechas usando [LeaderLine.js](https://anseki.github.io/leader-line/).
+- Interacción con el usuario mediante funciones de **zoom**, **arrastre** y **expansión/colapsado** de elementos.
+- Integración con Visual Studio Code a través de la API de extensiones y del depurador GDB.
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+---
 
-## For more information
+## Cómo probarlo
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+1. Clona o descarga el repositorio.
+2. Abre el proyecto en Visual Studio Code.
+3. Asegúrate de tener instalada la extensión oficial de C++ (ms-vscode.cpptools).
+4. Pulsa `F5` o selecciona `Run > Start Debugging` para lanzar el entorno de desarrollo de extensiones (**Extension Development Host**).
+5. Abre un proyecto C++ con configuración de depuración activa.
+6. Establece un punto de interrupción y ejecuta la depuración.
+7. Al detenerse la ejecución, la extensión mostrará un panel lateral con la visualización correspondiente.
 
-**Enjoy!**
